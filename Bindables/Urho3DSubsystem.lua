@@ -47,7 +47,12 @@ Urho3DSubsystem.ToString = function (self, indent)
 end
 
 Urho3DSubsystem.ApplyArguments = function (self)
-
+    if self.arguments ["BindingType"] == nil then
+        local type = DataUtils.GetNamedValueOfTable (data.classes, self.bindingType)
+        if type ~= nil then
+            self.bindingType = type.bindingName
+        end
+    end
 end
 
 Urho3DSubsystem.GetRequiredBindingsIncludes = function (self)
