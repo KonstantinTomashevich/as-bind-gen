@@ -13,8 +13,12 @@ TypeUtils.BasicCXXToASType = function (type)
         newType = newType .. " @"
     end
 
-    if newType:find ("SharedPtr <") or newType:find ("SharedPtr<") then
-        newType = TypeUtils.GetArrayElementType (newType)
+    if newType:find ("SharedPtr <") == 1 or newType:find ("SharedPtr<") == 1 then
+        newType = newType:match ("<.*>")
+        newType = newType:sub (2, newType:len () - 1)
+
+    elseif newType:find ("Array <") == 1 or newType:find ("Array<") == 1 then
+        newType = "Array <" .. TypeUtils.GetArrayElementType (newType) .. "> @"
     end
     return newType
 end
@@ -56,7 +60,7 @@ TypeUtils.RemoveNamespaces = function (type)
 end
 
 TypeUtils.ConvertCXXToASType = function (type)
-    return TypeUtils.RemoveNamespaces (TypeUtils.CheckParsedClassesAndEnumsNames (TypeUtils.BasicCXXToASType (type)))
+    return TypeUtils.CheckParsedClassesAndEnumsNames (TypeUtils.BasicCXXToASType (TypeUtils.RemoveNamespaces (type)))
 end
 
 TypeUtils.IsCXXArray = function (type)
@@ -87,16 +91,12 @@ TypeUtils.GetArrayElementType = function (type)
         elementType:find ("SharedPtr <") or elementType:find ("SharedPtr<") or
         elementType:find ("Array <") or elementType:find ("Array<") do
 
-        local index = elementType:find ("<") + 1
-        local newElementType = ""
-        local char = ""
-
-        while char ~= ">" and index <= type:len () do
-            newElementType = newElementType .. char
-            char = type:sub (index, index)
-            index = index + 1
+        local isAddRef = elementType:find ("SharedPtr <") == 1 or elementType:find ("SharedPtr<") == 1
+        elementType = elementType:match ("<.*>")
+        elementType = elementType:sub (2, elementType:len () - 1)
+        if isAddRef then
+            elementType = elementType .. " @"
         end
-        elementType = newElementType
     end
     return elementType
 end
