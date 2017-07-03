@@ -214,6 +214,10 @@ Function.ReadName = function (self, tokensList)
         token = tokensList:NextToken ()
     end
 
+    if token.type == Tokens.TypeOrName and token.value == "explicit" then
+        token = tokensList:NextToken ()
+    end
+
     if token == nil then
         Log ("Fatal error, token is nil!")
         return false
