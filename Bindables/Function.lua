@@ -461,12 +461,14 @@ Function.GenerateWrapperCode = function (self)
 
         if self.ownerClassName ~= nil and not self.isStatic then
             wrapperCode = wrapperCode .. "objectPtr->"
-        end
-
-        if self.isStatic then
+            
+        elseif self.isStatic then
             wrapperCode = wrapperCode .. self.ownerClassName .. "::"
-        end
 
+        elseif self.arguments ["AddNamespaceToCallName"]  ~= nil then
+            wrapperCode = wrapperCode .. self.arguments ["AddNamespaceToCallName"] .. "::"
+        end
+        
         wrapperCode = wrapperCode .. self.name .. " (" ..
                     self:GenerateWrapperFunctionCallArguments () .. ");\n"
 
